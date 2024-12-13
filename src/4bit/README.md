@@ -15,12 +15,26 @@
     <img src="../../assets/4bit/1_1080px-Intel_C4004_b.jpg" alt="The ceramic C4004 variant" width="25%">
 </a>
 
-## Architectural block diagram
+## Architecture
 <a href="https://en.wikipedia.org/wiki/Intel_4004" target="_blank">
-    <img src="../../assets/4bit/2_952px-4004_arch.png" alt="The ceramic C4004 variant" width="50%">
+    <img src="../../assets/4bit/2_952px-4004_arch.png" alt="The ceramic C4004 variant" width="80%">
 </a>
+
+- **Harvard Architecture**: Separates program memory (ROM) and data memory (RAM).
+- **Memory Access**: Requires multiple clock cycles to fetch instructions or data due to multiplexing.
+- **Components**: Part of the MCS-4 family, which includes:
+  - The 4004 CPU
+  - ROM chips for storing programs
+  - RAM chips for data storage
+  - Shift-register chips for I/O handling
 
 ## DIP chip pinout
 <a href="https://en.wikipedia.org/wiki/Intel_4004" target="_blank">
     <img src="../../assets/4bit/3_640px-Intel_4004_processor_pinout.png" alt="The ceramic C4004 variant" width="25%">
 </a>
+
+## Resources
+
+- **Datasheet**: [Intel 4004 Datasheet](https://datasheets.chipdb.org/Intel/MCS-4/datashts/intel-4004.pdf)
+- **Emulator**: [Intel 4004 Emulator](http://e4004.szyc.org/emu/)
+- **Blogs**: [The Strangeness of the Intel 4004](https://thechipletter.substack.com/p/the-strangeness-of-the-intel-4004)
