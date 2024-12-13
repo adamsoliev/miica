@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 
-RAM = bytearray(640)  # data memory | each 4002 RAM chip is 4 of 40-byte banks
+RAM = bytearray(640)  # data memory | each 4002 RAM chip consists of 4 of 40-byte banks
 
 ROM = bytearray(4096) # program memory | each 4001 ROM chip is 256-byte
 
@@ -10,6 +10,9 @@ INDEX_REGISTERS = [bytearray(4)] * 16   # registers
 ACCUMULATOR = bytearray(4)              
 TEMPORARY_REGISTER = bytearray(4)       # carry?
 INSTRUCTION_REGISTER = bytearray(8)     
+
+def parse_assembly_file(filename):
+    return
 
 def fetch():
     return 
