@@ -11,16 +11,16 @@
 - **Package**: Implemented in a 16-pin DIP package with multiplexed data and address lines to minimize pin count.
 
 ## Physical chip
-<a href="https://en.wikipedia.org/wiki/Intel_4004">
-    <img src="../../assets/4bit/1_1080px-Intel_C4004_b.jpg" alt="The ceramic C4004 variant" width="50%">
+<a href="https://en.wikipedia.org/wiki/Intel_4004" target="_blank">
+    <img src="../../assets/4bit/1_1080px-Intel_C4004_b.jpg" alt="The ceramic C4004 variant" width="25%">
 </a>
 
 ## Architectural block diagram
-<a href="https://en.wikipedia.org/wiki/Intel_4004">
-    <img src="../../assets/4bit/2_952px-4004_arch.png" alt="The ceramic C4004 variant" width="">
+<a href="https://en.wikipedia.org/wiki/Intel_4004" target="_blank">
+    <img src="../../assets/4bit/2_952px-4004_arch.png" alt="The ceramic C4004 variant" width="50%">
 </a>
 
 ## DIP chip pinout
-<a href="https://en.wikipedia.org/wiki/Intel_4004">
-    <img src="../../assets/4bit/3_640px-Intel_4004_processor_pinout.png" alt="The ceramic C4004 variant" width="50%">
+<a href="https://en.wikipedia.org/wiki/Intel_4004" target="_blank">
+    <img src="../../assets/4bit/3_640px-Intel_4004_processor_pinout.png" alt="The ceramic C4004 variant" width="25%">
 </a>
