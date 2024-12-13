@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 
-RAM = bytearray(640)  # data memory | each 4002 RAM chip is 40-byte
+RAM = bytearray(640)  # data memory | each 4002 RAM chip is 4 of 40-byte banks
 
 ROM = bytearray(4096) # program memory | each 4001 ROM chip is 256-byte
 
@@ -30,3 +30,17 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
+'''
+| address |             | storage |  status |
+|   0-15  |  register 0 | 8 bytes | 2 bytes |
+|  16-31  |  register 1 | 8 bytes | 2 bytes |
+|  32-47  |  register 2 | 8 bytes | 2 bytes |
+|  48-63  |  register 2 | 8 bytes | 2 bytes |
+
+the above is a bank; RAM chips were arranged in up to 4 banks of up to 4 chips
+'''
