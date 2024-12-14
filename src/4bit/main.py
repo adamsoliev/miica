@@ -15,75 +15,101 @@ from enum import Enum
 
 class InstructionSet(Enum):
     # Data Transfer Instructions
-    LD = (0b1010, None)    # Load register to accumulator
-    LDM = (0b1101, None)    # Load data to accumulator
-    CLB = (0b1111, 0b0000)  # Clear both accumulator and carry
-    CLC = (0b1111, 0b0001)  # Clear carry
-    IAC = (0b1111, 0b0010)  # Increment accumulator
-    CMC = (0b1111, 0b0011)  # Complement carry
-    CMA = (0b1111, 0b0100)  # Complement accumulator
-    RAL = (0b1111, 0b0101)  # Rotate left (accumulator and carry)
-    RAR = (0b1111, 0b0110)  # Rotate right (accumulator and carry)
-    TCC = (0b1111, 0b0111)  # Transfer carry to accumulator and clear carry
-    DAC = (0b1111, 0b1000)  # Decrement accumulator
-    TCS = (0b1111, 0b1001)  # Transfer carry subtract and clear carry
-    STC = (0b1111, 0b1010)  # Set carry
-    DAA = (0b1111, 0b1011)  # Decimal adjust accumulator
+    LD = 0b1010    # Load register to accumulator
+    LDM = 0b1101  # Load data to accumulator
+    IAC = 0b1111  # Increment accumulator
+    TCC = 0b1111  # Transfer carry to accumulator and clear carry
+    DAC = 0b1111  # Decrement accumulator
+    TCS = 0b1111  # Transfer carry subtract and clear carry
+    STC = 0b1111  # Set carry
+    DAA = 0b1111  # Decimal adjust accumulator
 
     # Fetch
-    FIM = (0b0010, 0b0000)    # Fetch immediate data to register pair
-    FIN = (0b0011, 0b0000)    # Fetch indirect from ROM
+    FIM = 0b0010  # Fetch immediate data to register pair
+    FIN = 0b0011  # Fetch indirect from ROM
 
     # Arithmetic Instructions
-    ADD = (0b1000, None)    # Add register to accumulator
-    SUB = (0b1001, None)    # Subtract register from accumulator
-    XCH = (0b1011, None)    # Exchange accumulator with register
+    ADD = 0b1000  # Add register to accumulator
+    SUB = 0b1001  # Subtract register from accumulator
+    XCH = 0b1011  # Exchange accumulator with register
 
     # Logical Instructions
-    CLC = (0b1111, 0b0001)  # Clear carry
-    CMC = (0b1111, 0b0011)  # Complement carry
-    CMA = (0b1111, 0b0100)  # Complement accumulator
-    RAL = (0b1111, 0b0101)  # Rotate left through carry
-    RAR = (0b1111, 0b0110)  # Rotate right through carry
+    CMC = 0b1111  # Complement carry
+    CMA = 0b1111  # Complement accumulator
+    CLB = 0b1111  # Clear both accumulator and carry
+    CLC = 0b1111  # Clear carry
+    RAL = 0b1111  # Rotate left (accumulator and carry)
+    RAR = 0b1111  # Rotate right (accumulator and carry)
 
     # Branch Instructions
-    JIN = (0b0011, 0b0001)    # Jump indirect
-    JUN = (0b0100, None)    # Jump unconditional
-    JMS = (0b0101, None)    # Jump to subroutine
-    JCN = (0b0001, None)    # Jump conditional
-    ISZ = (0b0111, None)    # Increment and skip if zero
+    JIN = 0b0011  # Jump indirect
+    JUN = 0b0100  # Jump unconditional
+    JMS = 0b0101  # Jump to subroutine
+    JCN = 0b0001  # Jump conditional
+    ISZ = 0b0111  # Increment and skip if zero
 
     # Machine Control Instructions
-    NOP = (0b0000, None)    # No operation
-    INC = (0b0110, None)    # Increment register
-    BBL = (0b1100, None)    # Branch back and load
+    NOP = 0b0000  # No operation
+    INC = 0b0110  # Increment register
+    BBL = 0b1100  # Branch back and load
 
     # Other
-    KBP = (0b1111, 0b1100)  # Keyboard process
-    DCL = (0b1111, 0b1101)  # Designate group
+    KBP = 0b1111  # Keyboard process
+    DCL = 0b1111  # Designate group
 
     # I/O and RAM Instructions
-    SRC = (0b0010, 0b0001)
-    WRM = (0b1110, 0b0000)
-    WMP = (0b1110, 0b0001)
-    WRR = (0b1110, 0b0010)
-    WPM = (0b1110, 0b0011)
-    WRO = (0b1110, 0b0100)
-    WR1 = (0b1110, 0b0101)
-    WR2 = (0b1110, 0b0110)
-    WR3 = (0b1110, 0b0111)
-    SBM = (0b1110, 0b1000)
-    RDM = (0b1110, 0b1001)
-    RDR = (0b1110, 0b1010)
-    ADM = (0b1110, 0b1011)
-    RD0 = (0b1110, 0b1100)
-    RD1 = (0b1110, 0b1101)
-    RD2 = (0b1110, 0b1110)
-    RD3 = (0b1110, 0b1111)
+    SRC = 0b0010
+    WRM = 0b1110
+    WMP = 0b1110
+    WRR = 0b1110
+    WPM = 0b1110
+    WRO = 0b1110
+    WR1 = 0b1110
+    WR2 = 0b1110
+    WR3 = 0b1110
+    SBM = 0b1110
+    RDM = 0b1110
+    RDR = 0b1110
+    ADM = 0b1110
+    RD0 = 0b1110
+    RD1 = 0b1110
+    RD2 = 0b1110
+    RD3 = 0b1110
 
 
 def parse_assembly_file(filename):
-    return
+    instructions = []
+    with open(filename, 'r') as file:
+        for line in file:
+            if ':' not in line or not line.strip():
+                continue
+            bytes = line.split(':')[1].strip().split()
+            i = 0
+            while i < len(bytes):
+                first_opr = int(bytes[i][0], 16)
+                second_opa = int(bytes[i][1], 16) & 0b1
+                if first_opr == 0b10:
+                    if second_opa == 0:
+                        instructions.append(InstructionSet.FIM)
+                        i += 2
+                    else:
+                        instructions.append(InstructionSet.SRC)
+                        i += 1
+                elif first_opr in [0b1,0b100,0b101,0b111]:
+                    instructions.append(InstructionSet(first_opr))
+                    i += 2
+                else:
+                    if first_opr == 0b11:
+                        if second_opa == 0:
+                            instructions.append(InstructionSet.FIN)
+                        else:
+                            instructions.append(InstructionSet.JIN)
+                    else:
+                        instructions.append(InstructionSet(first_opr))
+                    i += 1
+    for instruction in instructions:
+        print(instruction)
+
 
 def fetch():
     return 
@@ -94,13 +120,8 @@ def decode(string):
 def execute(opcode, operands):
     return
 
-def loop():
-    for i in range(100):
-        print("4004 is running")
-    return
-
 if __name__ == "__main__":
-    loop()
+    parse_assembly_file('sanity_test.asm')
 
 
 # ------------------------------------------------------------------
