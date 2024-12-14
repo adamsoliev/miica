@@ -12,8 +12,9 @@ TEMPORARY_REGISTER = bytearray(4)       # carry?
 INSTRUCTION_REGISTER = bytearray(8)     
 
 from enum import Enum
+from typing import List, Union
 
-class InstructionSet(Enum):
+class OP(Enum):
     # Data Transfer Instructions
     LD = 0b1010    # Load register to accumulator
     LDM = 0b1101  # Load data to accumulator
@@ -78,37 +79,41 @@ class InstructionSet(Enum):
 
 parsed = [32, 32, 13, 11, 33, 224, 15, 7, 6, 7, 32, 32, 13, 11, 33, 228, 15, 229, 15, 230, 15, 231, 15, 6, 7, 4, 0, 0, 0, 0, 0, 0]
 
-def parse_assembly_file(filename):
-    instructions = []
+def parse_assembly_file(filename: str) -> List[OP]:
+    instructions: List[OP] = []
     with open(filename, 'r') as file:
         for line in file:
             if ':' not in line or not line.strip():
                 continue
-            bytes = line.split(':')[1].strip().split()
-            i = 0
-            while i < len(bytes):
-                first_opr, second_opa = int(bytes[i][0], 16), int(bytes[i][1], 16)
-                if first_opr == 0b10:
-                    second_opa = second_opa & 0b1
-                    instructions.append(InstructionSet.FIM if second_opa == 0 else InstructionSet.SRC)
-                    i += 2 if second_opa == 0 else 1
-                elif first_opr in [0b1, 0b100, 0b101, 0b111]:
-                    instructions.append(InstructionSet(first_opr))
+            bytes_str: List[str] = line.split(':')[1].strip().split()
+            i: int = 0
+            while i < len(bytes_str):
+                first_opr: int = int(bytes_str[i][0], 16)
+                second_opa: int = int(bytes_str[i][1], 16)
+                if first_opr == 0x1:
+                    instructions.append(OP.JCN)
                     i += 2
-                elif first_opr == 0b1110:
-                    instructions.append(InstructionSet((first_opr << 4) | second_opa))
+                elif first_opr in {0x2, 0x3}:
+                    second_opa &= 0b1
+                    if first_opr == 0x2:
+                        instructions.append(OP.FIM if second_opa == 0 else OP.SRC)
+                    else:
+                        instructions.append(OP.FIN if second_opa == 0 else OP.JIN)
+                    i += 2 if second_opa == 0 else 1
+                elif first_opr in {0x4,0x5,0x7}:
+                    instructions.append(OP.JUN if first_opr == 0x4 else OP.JMS if first_opr == 0x5 else OP.ISZ)
+                    i += 2
+                elif first_opr == 0xE:
+                    instructions.append(OP((first_opr << 4) | second_opa))
                     i += 1
                 else:
-                    if first_opr == 0b11:
-                        second_opa = second_opa & 0b1
-                        instructions.append(InstructionSet.FIN if second_opa == 0 else InstructionSet.JIN)
-                    else:
-                        instructions.append(InstructionSet(first_opr))
+                    instructions.append(OP(first_opr))
                     i += 1
 
-    instruction_values = [int(instr.value) for instr in instructions]
-    assert(instruction_values == parsed)
+    instruction_values: List[int] = [int(instr.value) for instr in instructions]
+    assert instruction_values == parsed
     return instructions
+
 
 def fetch():
     return 
