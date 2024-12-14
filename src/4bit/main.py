@@ -79,8 +79,8 @@ class OP(Enum):
 
 parsed = [32, 32, 13, 11, 33, 224, 15, 7, 6, 7, 32, 32, 13, 11, 33, 228, 15, 229, 15, 230, 15, 231, 15, 6, 7, 4, 0, 0, 0, 0, 0, 0]
 
-def parse_assembly_file(filename: str) -> List[OP]:
-    instructions: List[OP] = []
+def parse_assembly_file(filename: str) -> List[tuple[OP, int]]:
+    instructions: List[tuple[OP, int]] = []
     with open(filename, 'r') as file:
         for line in file:
             if ':' not in line or not line.strip():
@@ -88,29 +88,49 @@ def parse_assembly_file(filename: str) -> List[OP]:
             bytes_str: List[str] = line.split(':')[1].strip().split()
             i: int = 0
             while i < len(bytes_str):
+                instruction: tuple[OP, int] = (OP.NOP, -1)
+
                 first_opr: int = int(bytes_str[i][0], 16)
-                second_opa: int = int(bytes_str[i][1], 16)
+                first_opa: int = int(bytes_str[i][1], 16)
                 if first_opr == 0x1:
-                    instructions.append(OP.JCN)
+                    second_opr: int = int(bytes_str[i + 1][0], 16)
+                    second_opa: int = int(bytes_str[i + 1][1], 16)
+                    d = (first_opa << 8) | (second_opr << 4) | second_opa
+
+                    instruction = (OP.JCN, d)
                     i += 2
                 elif first_opr in {0x2, 0x3}:
-                    second_opa &= 0b1
                     if first_opr == 0x2:
-                        instructions.append(OP.FIM if second_opa == 0 else OP.SRC)
+                        if first_opa & 0b1 == 0:
+                            second_opr: int = int(bytes_str[i + 1][0], 16)
+                            second_opa: int = int(bytes_str[i + 1][1], 16)
+                            d = (first_opa << 8) | (second_opr << 4) | second_opa
+                            instruction = (OP.FIM, d)
+                            i += 2
+                        else:
+                            instruction = (OP.SRC, second_opa)
+                            i += 1
                     else:
-                        instructions.append(OP.FIN if second_opa == 0 else OP.JIN)
-                    i += 2 if second_opa == 0 else 1
+                        instruction = (OP.FIN if (first_opa & 0b1) == 0 else OP.JIN, second_opa)
+                        i += 1
                 elif first_opr in {0x4,0x5,0x7}:
-                    instructions.append(OP.JUN if first_opr == 0x4 else OP.JMS if first_opr == 0x5 else OP.ISZ)
+                    second_opr: int = int(bytes_str[i + 1][0], 16)
+                    second_opa: int = int(bytes_str[i + 1][1], 16)
+                    d = (first_opa << 8) | (second_opr << 4) | second_opa
+
+                    instruction = (OP.JUN if first_opr == 0x4 else OP.JMS if first_opr == 0x5 else OP.ISZ, d)
                     i += 2
                 elif first_opr == 0xE:
-                    instructions.append(OP((first_opr << 4) | second_opa))
+                    instruction = (OP((first_opr << 4) | first_opa), 0) # no 2nd part in tuple since 1st has it already
                     i += 1
                 else:
-                    instructions.append(OP(first_opr))
+                    instruction = (OP(first_opr), second_opa)
                     i += 1
 
-    instruction_values: List[int] = [int(instr.value) for instr in instructions]
+                # assert instruction[1] != -1
+                instructions.append(instruction)
+
+    instruction_values: List[int] = [int(instr[0].value) for instr in instructions]
     assert instruction_values == parsed
     return instructions
 
