@@ -25,8 +25,8 @@ class InstructionSet(Enum):
     DAA = 0b1111  # Decimal adjust accumulator
 
     # Fetch
-    FIM = 0b0010  # Fetch immediate data to register pair
-    FIN = 0b0011  # Fetch indirect from ROM
+    FIM = 0b0010_0000  # Fetch immediate data to register pair
+    FIN = 0b0011_0000  # Fetch indirect from ROM
 
     # Arithmetic Instructions
     ADD = 0b1000  # Add register to accumulator
@@ -42,7 +42,7 @@ class InstructionSet(Enum):
     RAR = 0b1111  # Rotate right (accumulator and carry)
 
     # Branch Instructions
-    JIN = 0b0011  # Jump indirect
+    JIN = 0b0011_0001  # Jump indirect
     JUN = 0b0100  # Jump unconditional
     JMS = 0b0101  # Jump to subroutine
     JCN = 0b0001  # Jump conditional
@@ -58,24 +58,25 @@ class InstructionSet(Enum):
     DCL = 0b1111  # Designate group
 
     # I/O and RAM Instructions
-    SRC = 0b0010
-    WRM = 0b1110
-    WMP = 0b1110
-    WRR = 0b1110
-    WPM = 0b1110
-    WRO = 0b1110
-    WR1 = 0b1110
-    WR2 = 0b1110
-    WR3 = 0b1110
-    SBM = 0b1110
-    RDM = 0b1110
-    RDR = 0b1110
-    ADM = 0b1110
-    RD0 = 0b1110
-    RD1 = 0b1110
-    RD2 = 0b1110
-    RD3 = 0b1110
+    SRC = 0b0010_0001
+    WRM = 0b1110_0000
+    WMP = 0b1110_0001
+    WRR = 0b1110_0010
+    WPM = 0b1110_0011
+    WRO = 0b1110_0100
+    WR1 = 0b1110_0101
+    WR2 = 0b1110_0110
+    WR3 = 0b1110_0111
+    SBM = 0b1110_1000
+    RDM = 0b1110_1001
+    RDR = 0b1110_1010
+    ADM = 0b1110_1011
+    RD0 = 0b1110_1100
+    RD1 = 0b1110_1101
+    RD2 = 0b1110_1110
+    RD3 = 0b1110_1111
 
+parsed = [32, 32, 13, 11, 33, 224, 15, 7, 6, 7, 32, 32, 13, 11, 33, 228, 15, 229, 15, 230, 15, 231, 15, 6, 7, 4, 0, 0, 0, 0, 0, 0]
 
 def parse_assembly_file(filename):
     instructions = []
@@ -86,30 +87,28 @@ def parse_assembly_file(filename):
             bytes = line.split(':')[1].strip().split()
             i = 0
             while i < len(bytes):
-                first_opr = int(bytes[i][0], 16)
-                second_opa = int(bytes[i][1], 16) & 0b1
+                first_opr, second_opa = int(bytes[i][0], 16), int(bytes[i][1], 16)
                 if first_opr == 0b10:
-                    if second_opa == 0:
-                        instructions.append(InstructionSet.FIM)
-                        i += 2
-                    else:
-                        instructions.append(InstructionSet.SRC)
-                        i += 1
-                elif first_opr in [0b1,0b100,0b101,0b111]:
+                    second_opa = second_opa & 0b1
+                    instructions.append(InstructionSet.FIM if second_opa == 0 else InstructionSet.SRC)
+                    i += 2 if second_opa == 0 else 1
+                elif first_opr in [0b1, 0b100, 0b101, 0b111]:
                     instructions.append(InstructionSet(first_opr))
                     i += 2
+                elif first_opr == 0b1110:
+                    instructions.append(InstructionSet((first_opr << 4) | second_opa))
+                    i += 1
                 else:
                     if first_opr == 0b11:
-                        if second_opa == 0:
-                            instructions.append(InstructionSet.FIN)
-                        else:
-                            instructions.append(InstructionSet.JIN)
+                        second_opa = second_opa & 0b1
+                        instructions.append(InstructionSet.FIN if second_opa == 0 else InstructionSet.JIN)
                     else:
                         instructions.append(InstructionSet(first_opr))
                     i += 1
-    for instruction in instructions:
-        print(instruction)
 
+    instruction_values = [int(instr.value) for instr in instructions]
+    assert(instruction_values == parsed)
+    return instructions
 
 def fetch():
     return 
